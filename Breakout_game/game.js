@@ -63,6 +63,43 @@ function canvasApp() {
 
 	/* Number of turns */
 	var NTURNS = 3;
+	
+	/* The brick object. Knows how to draw itself */
+	
+	function Brick(x, y, w, h, color) {
+		this.x = x;
+		this.y = y;
+		this.h = h;
+		this.w = w;
+		this.color = color;
+		
+		this.drawBrick = function() {
+			ctx.fillStyle = this.color;
+			ctx.fillRect(this.x, this.y, this.w, this.h);
+		};
+		
+	}
+	
+	var brick_array = []
+	  
+	// Create an array of brick objects	
+	var colors = new Array();
+	colors[0] = "DarkSlateBlue ";
+	colors[1] = "DarkSlateGray ";
+	colors[2] = "DarkTurquoise  ";
+	colors[3] = "DarkViolet ";
+	colors[4] = "DeepPink ";
+	
+	var dy = BRICK_Y_OFFSET;
+	for ( var i = 0; i < NBRICK_ROWS; ++i ) {
+		var dx = BRICK_SEP;
+		for ( var j = 0; j < NBRICKS_PER_ROW; ++j) {
+			 
+			brick_array.push(new Brick(dx, dy, BRICK_WIDTH, BRICK_HEIGHT, colors[i / 2]));
+			dx += BRICK_WIDTH + BRICK_SEP;
+		}
+		dy += BRICK_HEIGHT + BRICK_SEP;
+	}
 
 	function Paddle() {
 		this.x = WIDTH / 2 - PADDLE_WIDTH / 2;
@@ -74,7 +111,7 @@ function canvasApp() {
 		this.x = WIDTH / 2;
 		this.y = HEIGHT / 2;
 		this.vx = 4;
-		this.vy = 8;
+		this.vy = 6;
 	}
 	 
 	var paddle = new Paddle();
@@ -157,26 +194,32 @@ function canvasApp() {
 		ctx.fill();
 	}
 	
+//	function drawBricks() {
+//		
+//		var colors = new Array();
+//		colors[0] = "DarkSlateBlue ";
+//		colors[1] = "DarkSlateGray ";
+//		colors[2] = "DarkTurquoise  ";
+//		colors[3] = "DarkViolet ";
+//		colors[4] = "DeepPink ";
+//		
+//		var dy = BRICK_Y_OFFSET;
+//		for ( var i = 0; i < NBRICK_ROWS; ++i ) {
+//			var dx = BRICK_SEP;
+//			for ( var j = 0; j < NBRICKS_PER_ROW; ++j) {
+//				ctx.fillStyle = colors[i / 2];
+//				ctx.fillRect(dx, dy, BRICK_WIDTH, BRICK_HEIGHT);
+//				dx += BRICK_WIDTH + BRICK_SEP;
+//			}
+//			dy += BRICK_HEIGHT + BRICK_SEP;
+//		};
+//	};
+	
 	function drawBricks() {
-		
-		var colors = new Array();
-		colors[0] = "DarkSlateBlue ";
-		colors[1] = "DarkSlateGray ";
-		colors[2] = "DarkTurquoise  ";
-		colors[3] = "DarkViolet ";
-		colors[4] = "DeepPink ";
-		
-		var dy = BRICK_Y_OFFSET;
-		for ( var i = 0; i < NBRICK_ROWS; ++i ) {
-			var dx = BRICK_SEP;
-			for ( var j = 0; j < NBRICKS_PER_ROW; ++j) {
-				ctx.fillStyle = colors[i / 2];
-				ctx.fillRect(dx, dy, BRICK_WIDTH, BRICK_HEIGHT);
-				dx += BRICK_WIDTH + BRICK_SEP;
-			}
-			dy += BRICK_HEIGHT + BRICK_SEP;
-		};
-	};
+		for ( var i = 0; i < brick_array.length; ++i) {
+			(brick_array[i]).drawBrick()
+		}
+	}
 	
 	// Keyup and keydown events
 	
