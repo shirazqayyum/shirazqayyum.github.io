@@ -74,7 +74,7 @@ function canvasApp() {
 		this.x = WIDTH / 2;
 		this.y = HEIGHT / 2;
 		this.vx = 4;
-		this.vy = 5;
+		this.vy = 8;
 	}
 	 
 	var paddle = new Paddle();
@@ -118,11 +118,11 @@ function canvasApp() {
 		ball.y += ball.vy;
 		
 		// Check for ball collisions
-		if ( ball.x <= 0 || ball.x >= (WIDTH - 2 * BALL_RADIUS) ) {
+		if ( (ball.x - BALL_RADIUS) <= 0 || (ball.x - BALL_RADIUS) >= (WIDTH - 2 * BALL_RADIUS) ) {
 			ball.vx = -ball.vx;
 		}
 		
-		if ( ball.y <= 0 || ball.y >= (HEIGHT - 2 * BALL_RADIUS) ) {
+		if ( (ball.y - BALL_RADIUS) <= 0 || (ball.y - BALL_RADIUS) >= (HEIGHT - 2 * BALL_RADIUS) ) {
 			ball.vy = -ball.vy;
 		} 
 		
@@ -137,7 +137,7 @@ function canvasApp() {
 	
 	
 	function drawBackground() {
-		ctx.fillStyle = 'white';
+		ctx.fillStyle = 'azure';
 		ctx.fillRect(0, 0, WIDTH, HEIGHT);
 	}
 	
