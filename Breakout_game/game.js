@@ -32,7 +32,7 @@ function canvasApp() {
 	var HEIGHT = APPLICATION_HEIGHT;
 
 	/* Dimensions of the paddle */
-	var PADDLE_WIDTH = 60;
+	var PADDLE_WIDTH = 70;
 	var PADDLE_HEIGHT = 10;
 
 	/* Offset of the paddle up from the bottom */
@@ -56,7 +56,7 @@ function canvasApp() {
 	var BRICK_HEIGHT = 12;
 
 	/* Radius of the ball in pixels */
-	var BALL_RADIUS = 10;
+	var BALL_RADIUS = 15;
 
 	/* Offset of the top brick row from the top */
 	var BRICK_Y_OFFSET = 70;
@@ -65,12 +65,20 @@ function canvasApp() {
 	var NTURNS = 3;
 
 	function Paddle() {
-		this.x = WIDTH/2 - PADDLE_WIDTH/2;
+		this.x = WIDTH / 2 - PADDLE_WIDTH / 2;
 		this.y = HEIGHT - PADDLE_Y_OFFSET;
 		this.v = 8;
 	}
 	
+	function Ball () {
+		this.x = WIDTH / 2;
+		this.y = HEIGHT / 2;
+		this.vx = 4;
+		this.vy = 5;
+	}
+	 
 	var paddle = new Paddle();
+	var ball = new Ball();
 //	
 //	var paddleX = WIDTH/2 - PADDLE_WIDTH/2;
 //	const paddleY = HEIGHT - PADDLE_Y_OFFSET;
@@ -105,6 +113,21 @@ function canvasApp() {
 			}
 		}
 		
+		// Update ball position
+		ball.x += ball.vx;
+		ball.y += ball.vy;
+		
+		// Check for ball collisions
+		if ( ball.x <= 0 || ball.x >= (WIDTH - 2 * BALL_RADIUS) ) {
+			ball.vx = -ball.vx;
+		}
+		
+		if ( ball.y <= 0 || ball.y >= (HEIGHT - 2 * BALL_RADIUS) ) {
+			ball.vy = -ball.vy;
+		} 
+		
+		
+		drawBall();
 		drawPaddle();
 	}; // end drawScreen()
 	
@@ -123,6 +146,16 @@ function canvasApp() {
 		ctx.fillRect(paddle.x, paddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);	
 	}
 	
+	function drawBall() {
+		//ctx.fillStyle = "red";
+		
+		ctx.beginPath();
+		ctx.fillStyle="royalblue";
+	    // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
+		ctx.arc(ball.x, ball.y, BALL_RADIUS,0, Math.PI*2, true); 
+		ctx.closePath();
+		ctx.fill();
+	}
 	
 	function drawBricks() {
 		
