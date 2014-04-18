@@ -1,26 +1,13 @@
-//
-//window.addEventListener('load', eventWindowLoaded, false) {
-//	function eventWindowLoaded() {
-//		canvasApp();
-//	};
-//};
-//
-//function canvasApp(){
-//	var theCanvas = document.getElementById("myCanvas"); 
-//	if (!theCanvas || !theCanvas.getContext) {
-//		return; 
-//	}
-//	var context = theCanvas.getContext("2d");
-//	
-//	if (!context) {
-//		return; 
-//	};
 
-	var c = document.getElementById("myCanvas");
-	var ctx = c.getContext("2d");
-	canvasApp();
-	
-	// Canvas app level variables	
+/* BREAKOUT 
+ * Author: Shiraz Qayyum 
+ * 2014
+ */ 
+
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext("2d");
+canvasApp();
+
 
 function canvasApp() {
 	/* Width and height of application window in pixels */
