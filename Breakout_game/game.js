@@ -251,11 +251,19 @@ function canvasApp() {
 		/* Update ball position */
 		ball.x += ball.vx;
 		ball.y += ball.vy;
+		
+		requestAnimationFrame(drawScreen);
 	}; 
-	const FRAME_RATE = 60;
-	var intervalTime = 1000 / FRAME_RATE;
-	setInterval(drawScreen, intervalTime );
+	
+	requestAnimationFrame(drawScreen);
+//	const FRAME_RATE = 60;
+//	var intervalTime = 1000 / FRAME_RATE;
+//	setInterval(drawScreen, intervalTime );
+
+	
 
 	
 }; // end canasApp()
+
+
 
