@@ -94,8 +94,7 @@ function canvasApp() {
 		this.drawBall = function() {
 			ctx.beginPath();
 			ctx.fillStyle="royalblue";
-		    // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
-			ctx.arc(ball.x, ball.y, BALL_RADIUS,0, Math.PI*2, true); 
+			ctx.arc(ball.x + BALL_RADIUS, ball.y + BALL_RADIUS, BALL_RADIUS,0, Math.PI*2, true); 
 			ctx.closePath();
 			ctx.fill();
 		}
@@ -106,6 +105,7 @@ function canvasApp() {
 	 * Each brick should be told where to draw itself i.e.
 	 * its upper left coordinates x, y
 	 */
+	
 	var brick_array = [];
 	
 	var colors = new Array();
@@ -146,6 +146,7 @@ function canvasApp() {
 	}
 	
 	/* Keyup and keydown events */
+	
 	document.onkeydown = function(e){
 		e = e?e:window.event;  
 		key_press_list[e.keyCode] = true;
@@ -160,7 +161,8 @@ function canvasApp() {
 
 	/* All the drawing should go in here  
 	 * - Called in main drawScreen() loop
-	 * */
+	 */
+	
 	function render() {
 		drawBackground();
 		drawBricks();
@@ -171,6 +173,7 @@ function canvasApp() {
 	/* Check for controlling commands (arrow keys) from the player 
 	 * - Called in main drawScreen() loop
 	 */
+	
 	function control() {
 		/* Move paddle to left */
 		if ( key_press_list[37] ) {	
@@ -183,6 +186,7 @@ function canvasApp() {
 		}
 		
 		/* Move paddle to right */
+		
 		if ( key_press_list[39] ) {
 			if (paddle.x + paddle.v >= WIDTH - PADDLE_WIDTH ) {
 				var delta = WIDTH - PADDLE_WIDTH - paddle.x;
@@ -193,6 +197,26 @@ function canvasApp() {
 		}
 	}
 	
+	/* Check bounding box collision for two objects that have x, y, w, h */
+	
+	function boundingBoxCollision(object1, object2) {
+		var left1 = object1.x;
+		var left2 = object2.x;
+		var right1 = object1.x + object1.w; 
+		var right2 = object2.x + object2.w; 
+		var top1 = object1.y;
+		var top2 = object2.y;
+		var bottom1 = object1.y + object1.h; 
+		var bottom2 = object2.y + object2.h;
+		
+		if (bottom1 < top2) return(false); 
+		if (top1 > bottom2) return(false);
+		if (right1 < left2) return(false);
+		if (left1 > right2) return(false);
+		
+		return(true);
+	}
+	
 	/* The main Canvas draw loop, called over and over to 
 	 * animate the game play
 	 */
@@ -201,18 +225,32 @@ function canvasApp() {
 		render();
 		control();
 			
-		/* Update ball position */
-		ball.x += ball.vx;
-		ball.y += ball.vy;
+		
 		
 		/* Check for ball collisions with the walls */
-		if ( (ball.x - BALL_RADIUS) <= 0 || (ball.x - BALL_RADIUS) >= (WIDTH - 2 * BALL_RADIUS) ) {
+		if ( (ball.x) <= 0 || (ball.x ) >= (WIDTH - 2 * BALL_RADIUS) ) {
 			ball.vx = -ball.vx;
 		}
 		
-		if ( (ball.y - BALL_RADIUS) <= 0 || (ball.y - BALL_RADIUS) >= (HEIGHT - 2 * BALL_RADIUS) ) {
+		if ( (ball.y ) <= 0 ) {
 			ball.vy = -ball.vy;
-		} 		
+		}
+		
+		for ( var i = 0; i < brick_array.length; ++i) {
+			if ( boundingBoxCollision(ball, brick_array[i]) ) {
+				brick_array.splice(i, 1);
+				ball.vy = - ball.vy;
+				break;
+			}
+		}
+		
+		if ( boundingBoxCollision(ball, paddle) ) {
+			ball.vy = -ball.vy;
+		}
+		
+		/* Update ball position */
+		ball.x += ball.vx;
+		ball.y += ball.vy;
 	}; 
 	const FRAME_RATE = 50;
 	var intervalTime = 1000 / FRAME_RATE;
