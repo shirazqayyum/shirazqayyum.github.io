@@ -135,7 +135,7 @@ function canvasApp() {
 	
 		
 	function drawBackground() {
-		ctx.fillStyle = 'azure';
+		ctx.fillStyle = 'cornsilk';
 		ctx.fillRect(0, 0, WIDTH, HEIGHT);
 	}
 	
