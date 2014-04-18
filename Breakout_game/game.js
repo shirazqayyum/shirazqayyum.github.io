@@ -24,45 +24,45 @@
 
 function canvasApp() {
 	/* Width and height of application window in pixels */
-	var APPLICATION_WIDTH = c.getAttribute("width");
-	var APPLICATION_HEIGHT = c.getAttribute("height");
+	const APPLICATION_WIDTH = c.getAttribute("width");
+	const APPLICATION_HEIGHT = c.getAttribute("height");
 
 	/* Dimensions of game board (usually the same) */
-	var WIDTH = APPLICATION_WIDTH;
-	var HEIGHT = APPLICATION_HEIGHT;
+	const WIDTH = APPLICATION_WIDTH;
+	const HEIGHT = APPLICATION_HEIGHT;
 
 	/* Dimensions of the paddle */
-	var PADDLE_WIDTH = 70;
-	var PADDLE_HEIGHT = 10;
+	const PADDLE_WIDTH = 70;
+	const PADDLE_HEIGHT = 10;
 
 	/* Offset of the paddle up from the bottom */
-	var PADDLE_Y_OFFSET = 30;
+	const PADDLE_Y_OFFSET = 30;
 
 	/* Number of bricks per row */
-	var NBRICKS_PER_ROW = 10;
+	const NBRICKS_PER_ROW = 10;
 
 	/* Number of rows of bricks */
-	var NBRICK_ROWS = 10;
+	const NBRICK_ROWS = 10;
 
 	/* Separation between bricks */
-	var BRICK_SEP = 4;
+	const BRICK_SEP = 4;
 
 	/* Width of a brick */
-	var BRICK_WIDTH =
+	const BRICK_WIDTH =
 	  //(WIDTH - (NBRICKS_PER_ROW - 1) * BRICK_SEP) / NBRICKS_PER_ROW;
 		//((WIDTH / BRICK_SEP) - 1) / NBRICKS_PER_ROW;
 		((WIDTH - BRICK_SEP) / NBRICKS_PER_ROW) - BRICK_SEP;
 	/* Height of a brick */
-	var BRICK_HEIGHT = 12;
+	const BRICK_HEIGHT = 12;
 
 	/* Radius of the ball in pixels */
-	var BALL_RADIUS = 15;
+	const BALL_RADIUS = 15;
 
 	/* Offset of the top brick row from the top */
-	var BRICK_Y_OFFSET = 70;
+	const BRICK_Y_OFFSET = 70;
 
 	/* Number of turns */
-	var NTURNS = 3;
+	const NTURNS = 3;
 	
 	
 	
@@ -154,7 +154,7 @@ function canvasApp() {
 	
 	function drawBricks() {
 		for ( var i = 0; i < brick_array.length; ++i) {
-			(brick_array[i]).drawBrick()
+			(brick_array[i]).drawBrick();
 		}
 	}
 	
@@ -171,14 +171,20 @@ function canvasApp() {
 	
 	
 
-	/* The main Canvas draw loop, called over and over to 
-	 * animate the game play
-	 */
-	
-	function drawScreen() {	
+	/* All the drawing should go in here  
+	 * - Called in main drawScreen() loop
+	 * */
+	function render() {
 		drawBackground();
-		drawBricks();	
-		
+		drawBricks();
+		ball.drawBall();
+		paddle.drawPaddle();
+	}
+	
+	/* Check for controlling commands (arrow keys) from the player 
+	 * - Called in main drawScreen() loop
+	 */
+	function control() {
 		/* Move paddle to left */
 		if ( key_press_list[37] ) {	
 			if (paddle.x - paddle.v <= 0 ) {
@@ -198,7 +204,16 @@ function canvasApp() {
 				paddle.x += paddle.v;
 			}
 		}
-		
+	}
+	
+	/* The main Canvas draw loop, called over and over to 
+	 * animate the game play
+	 */
+	
+	function drawScreen() {	
+		render();
+		control();
+			
 		/* Update ball position */
 		ball.x += ball.vx;
 		ball.y += ball.vy;
@@ -210,17 +225,12 @@ function canvasApp() {
 		
 		if ( (ball.y - BALL_RADIUS) <= 0 || (ball.y - BALL_RADIUS) >= (HEIGHT - 2 * BALL_RADIUS) ) {
 			ball.vy = -ball.vy;
-		} 
-			
-		ball.drawBall();
-		paddle.drawPaddle();
-	}; // end drawScreen()
-	
+		} 		
+	}; 
 	const FRAME_RATE = 50;
 	var intervalTime = 1000 / FRAME_RATE;
 	setInterval(drawScreen, intervalTime );
 
-	
 	
 }; // end canasApp()
 
