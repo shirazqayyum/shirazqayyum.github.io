@@ -252,7 +252,7 @@ function canvasApp() {
 		ball.x += ball.vx;
 		ball.y += ball.vy;
 	}; 
-	const FRAME_RATE = 50;
+	const FRAME_RATE = 60;
 	var intervalTime = 1000 / FRAME_RATE;
 	setInterval(drawScreen, intervalTime );
 
