@@ -73,6 +73,8 @@ function canvasApp() {
 	function Paddle() {
 		this.x = WIDTH / 2 - PADDLE_WIDTH / 2;
 		this.y = HEIGHT - PADDLE_Y_OFFSET;
+		this.w = PADDLE_WIDTH;
+		this.h = PADDLE_HEIGHT;
 		this.v = 8;
 		
 		this.drawPaddle = function() {
@@ -109,11 +111,11 @@ function canvasApp() {
 	var brick_array = [];
 	
 	var colors = new Array();
-	colors[0] = "DarkSlateBlue ";
-	colors[1] = "DarkSlateGray ";
-	colors[2] = "DarkTurquoise  ";
-	colors[3] = "DarkViolet ";
-	colors[4] = "DeepPink ";
+	colors[0] = "DarkSlateBlue";
+	colors[1] = "DarkSlateGray";
+	colors[2] = "DarkTurquoise";
+	colors[3] = "DarkViolet";
+	colors[4] = "DeepPink";
 	
 	var dy = BRICK_Y_OFFSET;
 	for ( var i = 0; i < NBRICK_ROWS; ++i ) {
@@ -224,15 +226,13 @@ function canvasApp() {
 	function drawScreen() {	
 		render();
 		control();
-			
-		
 		
 		/* Check for ball collisions with the walls */
 		if ( (ball.x) <= 0 || (ball.x ) >= (WIDTH - 2 * BALL_RADIUS) ) {
 			ball.vx = -ball.vx;
 		}
 		
-		if ( (ball.y ) <= 0 ) {
+		if ( (ball.y) <= 0 ) {
 			ball.vy = -ball.vy;
 		}
 		
@@ -244,7 +244,7 @@ function canvasApp() {
 			}
 		}
 		
-		if ( boundingBoxCollision(ball, paddle) ) {
+		if ( boundingBoxCollision(paddle, ball) ) {
 			ball.vy = -ball.vy;
 		}
 		
