@@ -64,6 +64,8 @@ function canvasApp() {
 	/* Number of turns */
 	var NTURNS = 3;
 	
+	
+	
 	/* The brick object. Knows how to draw itself */
 	
 	function Brick(x, y, w, h, color) {
@@ -76,13 +78,49 @@ function canvasApp() {
 		this.drawBrick = function() {
 			ctx.fillStyle = this.color;
 			ctx.fillRect(this.x, this.y, this.w, this.h);
-		};
-		
+		};	
 	}
 	
-	var brick_array = []
-	  
-	// Create an array of brick objects	
+	/* The Paddle object. Knows how to draw itself */
+	
+	function Paddle() {
+		this.x = WIDTH / 2 - PADDLE_WIDTH / 2;
+		this.y = HEIGHT - PADDLE_Y_OFFSET;
+		this.v = 8;
+		
+		this.drawPaddle = function() {
+			ctx.fillStyle = "black";
+			ctx.fillRect(paddle.x, paddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);	
+		}
+	}
+	
+	/* The Ball object. Knows how to draw itself */
+	
+	function Ball () {
+		this.x = WIDTH / 2;
+		this.y = HEIGHT / 2;
+		this.w = 2 * BALL_RADIUS;
+		this.h = 2 * BALL_RADIUS;
+		this.vx = 4;
+		this.vy = 6;
+		
+		this.drawBall = function() {
+			ctx.beginPath();
+			ctx.fillStyle="royalblue";
+		    // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
+			ctx.arc(ball.x, ball.y, BALL_RADIUS,0, Math.PI*2, true); 
+			ctx.closePath();
+			ctx.fill();
+		}
+	}
+	
+	
+	/* Initialize the brick array with all the bricks
+	 * Each brick should be told where to draw itself i.e.
+	 * its upper left coordinates x, y
+	 */
+	var brick_array = [];
+	
 	var colors = new Array();
 	colors[0] = "DarkSlateBlue ";
 	colors[1] = "DarkSlateGray ";
@@ -101,37 +139,48 @@ function canvasApp() {
 		dy += BRICK_HEIGHT + BRICK_SEP;
 	}
 
-	function Paddle() {
-		this.x = WIDTH / 2 - PADDLE_WIDTH / 2;
-		this.y = HEIGHT - PADDLE_Y_OFFSET;
-		this.v = 8;
-	}
-	
-	function Ball () {
-		this.x = WIDTH / 2;
-		this.y = HEIGHT / 2;
-		this.vx = 4;
-		this.vy = 6;
-	}
-	 
+	/* Create the paddle and the ball too */
 	var paddle = new Paddle();
 	var ball = new Ball();
-//	
-//	var paddleX = WIDTH/2 - PADDLE_WIDTH/2;
-//	const paddleY = HEIGHT - PADDLE_Y_OFFSET;
-//	const paddleVelocity = 8;
 	
-	var keyPressList = [];
+	/* Array to store the key presses */
+	var key_press_list = [];
+	
+		
+	function drawBackground() {
+		ctx.fillStyle = 'azure';
+		ctx.fillRect(0, 0, WIDTH, HEIGHT);
+	}
+	
+	function drawBricks() {
+		for ( var i = 0; i < brick_array.length; ++i) {
+			(brick_array[i]).drawBrick()
+		}
+	}
+	
+	/* Keyup and keydown events */
+	document.onkeydown = function(e){
+		e = e?e:window.event;  
+		key_press_list[e.keyCode] = true;
+	};
+		
+	document.onkeyup = function(e){ 
+		e = e?e:window.event;
+		key_press_list[e.keyCode] = false; 
+	};
+	
 	
 
-	// Canvas draw loop
+	/* The main Canvas draw loop, called over and over to 
+	 * animate the game play
+	 */
+	
 	function drawScreen() {	
 		drawBackground();
-		drawBricks();
-		
+		drawBricks();	
 		
 		/* Move paddle to left */
-		if ( keyPressList[37] ) {	
+		if ( key_press_list[37] ) {	
 			if (paddle.x - paddle.v <= 0 ) {
 				var delta = 0 - paddle.x;
 				paddle.x += delta;
@@ -141,7 +190,7 @@ function canvasApp() {
 		}
 		
 		/* Move paddle to right */
-		if ( keyPressList[39] ) {
+		if ( key_press_list[39] ) {
 			if (paddle.x + paddle.v >= WIDTH - PADDLE_WIDTH ) {
 				var delta = WIDTH - PADDLE_WIDTH - paddle.x;
 				paddle.x += delta;
@@ -150,11 +199,11 @@ function canvasApp() {
 			}
 		}
 		
-		// Update ball position
+		/* Update ball position */
 		ball.x += ball.vx;
 		ball.y += ball.vy;
 		
-		// Check for ball collisions
+		/* Check for ball collisions with the walls */
 		if ( (ball.x - BALL_RADIUS) <= 0 || (ball.x - BALL_RADIUS) >= (WIDTH - 2 * BALL_RADIUS) ) {
 			ball.vx = -ball.vx;
 		}
@@ -162,78 +211,16 @@ function canvasApp() {
 		if ( (ball.y - BALL_RADIUS) <= 0 || (ball.y - BALL_RADIUS) >= (HEIGHT - 2 * BALL_RADIUS) ) {
 			ball.vy = -ball.vy;
 		} 
-		
-		
-		drawBall();
-		drawPaddle();
+			
+		ball.drawBall();
+		paddle.drawPaddle();
 	}; // end drawScreen()
 	
 	const FRAME_RATE = 50;
 	var intervalTime = 1000 / FRAME_RATE;
 	setInterval(drawScreen, intervalTime );
+
 	
-	
-	function drawBackground() {
-		ctx.fillStyle = 'azure';
-		ctx.fillRect(0, 0, WIDTH, HEIGHT);
-	}
-	
-	function drawPaddle() {
-		ctx.fillStyle = "black";
-		ctx.fillRect(paddle.x, paddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);	
-	}
-	
-	function drawBall() {
-		//ctx.fillStyle = "red";
-		
-		ctx.beginPath();
-		ctx.fillStyle="royalblue";
-	    // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
-		ctx.arc(ball.x, ball.y, BALL_RADIUS,0, Math.PI*2, true); 
-		ctx.closePath();
-		ctx.fill();
-	}
-	
-//	function drawBricks() {
-//		
-//		var colors = new Array();
-//		colors[0] = "DarkSlateBlue ";
-//		colors[1] = "DarkSlateGray ";
-//		colors[2] = "DarkTurquoise  ";
-//		colors[3] = "DarkViolet ";
-//		colors[4] = "DeepPink ";
-//		
-//		var dy = BRICK_Y_OFFSET;
-//		for ( var i = 0; i < NBRICK_ROWS; ++i ) {
-//			var dx = BRICK_SEP;
-//			for ( var j = 0; j < NBRICKS_PER_ROW; ++j) {
-//				ctx.fillStyle = colors[i / 2];
-//				ctx.fillRect(dx, dy, BRICK_WIDTH, BRICK_HEIGHT);
-//				dx += BRICK_WIDTH + BRICK_SEP;
-//			}
-//			dy += BRICK_HEIGHT + BRICK_SEP;
-//		};
-//	};
-	
-	function drawBricks() {
-		for ( var i = 0; i < brick_array.length; ++i) {
-			(brick_array[i]).drawBrick()
-		}
-	}
-	
-	// Keyup and keydown events
-	
-	document.onkeydown = function(e){
-		e = e?e:window.event; 
-		//ConsoleLog.log(e.keyCode + "down"); 
-		keyPressList[e.keyCode] = true;
-	};
-		
-	document.onkeyup = function(e){ 
-		e = e?e:window.event;
-		//ConsoleLog.log(e.keyCode + "up");
-		keyPressList[e.keyCode] = false; 
-	};
 	
 }; // end canasApp()
 
