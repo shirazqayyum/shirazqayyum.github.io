@@ -94,7 +94,7 @@ function canvasApp() {
 		this.h = 2 * BALL_RADIUS;
 		this.vx = 0;
 		this.vy = 0;
-		this.vx_saved = 4;
+		this.vx_saved = Math.floor( (Math.random() * 5) - 5);
 		this.vy_saved = 6;
 		this.pause = 1;
 		
