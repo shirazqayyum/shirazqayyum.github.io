@@ -7,9 +7,11 @@
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
 canvasApp();
-
+var globalID;
 
 function canvasApp() {
+	
+	
 	/* Width and height of application window in pixels */
 	const APPLICATION_WIDTH = c.getAttribute("width");
 	const APPLICATION_HEIGHT = c.getAttribute("height");
@@ -90,8 +92,11 @@ function canvasApp() {
 		this.y = HEIGHT / 2;
 		this.w = 2 * BALL_RADIUS;
 		this.h = 2 * BALL_RADIUS;
-		this.vx = 4;
-		this.vy = 6;
+		this.vx = 0;
+		this.vy = 0;
+		this.vx_saved = 4;
+		this.vy_saved = 6;
+		this.pause = 1;
 		
 		this.drawBall = function() {
 			ctx.beginPath();
@@ -152,6 +157,22 @@ function canvasApp() {
 	document.onkeydown = function(e){
 		e = e?e:window.event;  
 		key_press_list[e.keyCode] = true;
+		
+		/* The ball's motion can be controlled using the 'enter' key */
+		
+		if ( e.keyCode == 13) {
+			if ( ball.pause == 1) {
+				ball.vx = ball.vx_saved;
+				ball.vy = ball.vy_saved;
+				ball.pause = 0;
+			} else {
+				ball.vx_saved = ball.vx;
+				ball.vy_saved = ball.vy;
+				ball.vx = 0;
+				ball.vy = 0;
+				ball.pause = 1;
+			}
+		}	
 	};
 		
 	document.onkeyup = function(e){ 
@@ -219,6 +240,7 @@ function canvasApp() {
 		return(true);
 	}
 	
+	
 	/* The main Canvas draw loop, called over and over to 
 	 * animate the game play
 	 */
@@ -252,17 +274,16 @@ function canvasApp() {
 		ball.x += ball.vx;
 		ball.y += ball.vy;
 		
-		requestAnimationFrame(drawScreen);
+		globalID = requestAnimationFrame(drawScreen);
+		
 	}; 
 	
-	requestAnimationFrame(drawScreen);
+	globalID = requestAnimationFrame(drawScreen);
+	
 //	const FRAME_RATE = 60;
 //	var intervalTime = 1000 / FRAME_RATE;
 //	setInterval(drawScreen, intervalTime );
 
-	
-
-	
 }; // end canasApp()
 
 
