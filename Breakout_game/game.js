@@ -4,10 +4,26 @@
  * 2014
  */ 
 
+window.addEventListener('load', eventWindowLoaded, false); 
+function eventWindowLoaded() {
+var audioElement = document.getElementById("theAudio");
+	audioElement.addEventListener('progress',updateLoadingStatus,false);
+	audioElement.addEventListener('canplaythrough',audioLoaded,false); 
+	audioElement.load();
+}
+
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
+
+var score_canvas = document.getElementById("scoreCanvas");
+var score_ctx = score_canvas.getContext("2d");
+
+var audioElement = document.getElementById("theAudio"); 
+audioElement.play();
+
 canvasApp();
 var globalID;
+
 
 function canvasApp() {
 	
@@ -21,7 +37,7 @@ function canvasApp() {
 	const HEIGHT = APPLICATION_HEIGHT;
 
 	/* Dimensions of the paddle */
-	const PADDLE_WIDTH = 70;
+	const PADDLE_WIDTH = 80;
 	const PADDLE_HEIGHT = 10;
 
 	/* Offset of the paddle up from the bottom */
@@ -46,6 +62,12 @@ function canvasApp() {
 
 	/* Radius of the ball in pixels */
 	const BALL_RADIUS = 15;
+	
+	const BALL_MAX_VEL = 3;
+	
+	const BALL_MIN_VEL = -3;
+	
+	const SPEED_BUMP = 1;
 
 	/* Offset of the top brick row from the top */
 	const BRICK_Y_OFFSET = 70;
@@ -53,6 +75,9 @@ function canvasApp() {
 	/* Number of turns */
 	const NTURNS = 3;
 	
+	const SCORE_INCREMENT = 100;
+	
+	var score = 0;
 	
 	
 	/* The brick object. Knows how to draw itself */
@@ -94,7 +119,7 @@ function canvasApp() {
 		this.h = 2 * BALL_RADIUS;
 		this.vx = 0;
 		this.vy = 0;
-		this.vx_saved = Math.floor( (Math.random() * 11) - 5);
+		this.vx_saved = Math.floor( (Math.random() * (BALL_MAX_VEL - BALL_MIN_VEL + 1)) + BALL_MIN_VEL);
 		this.vy_saved = 6;
 		this.pause = 1;
 		
@@ -180,6 +205,15 @@ function canvasApp() {
 		key_press_list[e.keyCode] = false; 
 	};
 	
+	/* Score updating function */
+	
+	function updateScore() {
+		score_ctx.fillStyle = 'Darkgrey';
+		score_ctx.fillRect(0, 0, score_canvas.getAttribute("width"), score_canvas.getAttribute("height"));
+		score_ctx.fillStyle = 'white';
+		score_ctx.font = "50px serif"
+		score_ctx.fillText("Score: " + score, scoreCanvas.width/10, scoreCanvas.height/2 );
+	}
 	
 
 	/* All the drawing should go in here  
@@ -188,6 +222,7 @@ function canvasApp() {
 	
 	function render() {
 		drawBackground();
+		updateScore();
 		drawBricks();
 		ball.drawBall();
 		paddle.drawPaddle();
@@ -262,12 +297,21 @@ function canvasApp() {
 			if ( boundingBoxCollision(ball, brick_array[i]) ) {
 				brick_array.splice(i, 1);
 				ball.vy = - ball.vy;
+				score += SCORE_INCREMENT;
 				break;
 			}
 		}
 		
 		if ( boundingBoxCollision(paddle, ball) ) {
 			ball.vy = -ball.vy;
+			if ( key_press_list[39] ) {
+				ball.vx += SPEED_BUMP;
+			}
+			
+			if ( key_press_list[37] ) {
+				ball.vx -= SPEED_BUMP;
+			}
+			
 		}
 		
 		/* Update ball position */
