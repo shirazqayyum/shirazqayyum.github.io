@@ -6,27 +6,29 @@
 
 window.addEventListener('load', eventWindowLoaded, false); 
 function eventWindowLoaded() {
-var audioElement = document.getElementById("theAudio");
+var audioElement = document.getElementById("bounceAudio");
 	audioElement.addEventListener('progress',updateLoadingStatus,false);
 	audioElement.addEventListener('canplaythrough',audioLoaded,false); 
-	audioElement.load();
+	audioElement.load();	
 }
-
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
 
 var score_canvas = document.getElementById("scoreCanvas");
 var score_ctx = score_canvas.getContext("2d");
 
-var audioElement = document.getElementById("theAudio"); 
-audioElement.play();
+var audioElement = document.getElementById("bounceAudio"); 
+
 
 canvasApp();
-var globalID;
 
 
 function canvasApp() {
 	
+	
+	
+	
+	var globalID;	
 	
 	/* Width and height of application window in pixels */
 	const APPLICATION_WIDTH = c.getAttribute("width");
@@ -212,7 +214,7 @@ function canvasApp() {
 		score_ctx.fillRect(0, 0, score_canvas.getAttribute("width"), score_canvas.getAttribute("height"));
 		score_ctx.fillStyle = 'white';
 		score_ctx.font = "50px serif"
-		score_ctx.fillText("Score: " + score, scoreCanvas.width/10, scoreCanvas.height/2 );
+		score_ctx.fillText("Score: " + score, scoreCanvas.width/10, scoreCanvas.height/1.4 );
 	}
 	
 
@@ -295,6 +297,7 @@ function canvasApp() {
 		
 		for ( var i = 0; i < brick_array.length; ++i) {
 			if ( boundingBoxCollision(ball, brick_array[i]) ) {
+				audioElement.play();
 				brick_array.splice(i, 1);
 				ball.vy = - ball.vy;
 				score += SCORE_INCREMENT;
