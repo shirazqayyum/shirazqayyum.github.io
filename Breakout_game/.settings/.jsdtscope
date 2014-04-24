@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry excluding="processing-js-1.4.1/|processing-js-1.4.1/extensions/" kind="src" path=""/>
-	<classpathentry excluding="extensions/" kind="src" path="processing-js-1.4.1"/>
-	<classpathentry kind="src" path="processing-js-1.4.1/extensions"/>
-	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="output" path=""/>
-</classpath>
