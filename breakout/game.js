@@ -25,10 +25,67 @@ canvasApp();
 
 function canvasApp() {
 	
+	/* For now the game just has three states */
 	
+	const GAME_STATE_TITLE = 0;
+	const GAME_STATE_NEW_GAME = 1; 
+	const GAME_STATE_GAME_OVER = 2;
 	
+	var globalID;
+	var currentGameState = GAME_STATE_TITLE;
+	var currentGameStateFunction = null;
+	var start_level_one = false;
 	
-	var globalID;	
+	/* Function to switch between different game states */
+	
+	function switchGameState(newState) { 
+		currentGameState = newState; 
+		switch (currentGameState) {
+			case GAME_STATE_TITLE: 
+				currentGameStateFunction = gameStateTitle;
+				break;
+			case GAME_STATE_NEW_GAME: 
+				currentGameStateFunction = gameStateNewGame;
+				break;
+			case GAME_STATE_GAME_OVER: 
+				currentGameStateFunction = gameStateGameOver; 
+				break;
+		} 
+	}
+	
+	/* start game */
+	switchGameState(currentGameState);
+	
+	function currentGameStateFunction() {	
+		globalID = requestAnimationFrame(currentGameStateFunction);
+	}
+	
+	/* This is the title page show to the user */
+	
+	function gameStateTitle() {
+		drawBackground();
+		ctx.fillStyle = 'crimson';
+		ctx.font = "100px serif";
+		ctx.fillText('Breakout', 120, 300);
+		
+		globalID = requestAnimationFrame(gameStateTitle);
+		
+		/* If the user hits enter start_level_one is set to true */
+		
+		if ( start_level_one ) {
+			cancelAnimationFrame(globalID);
+			switchGameState(GAME_STATE_NEW_GAME);
+			globalID = requestAnimationFrame(currentGameStateFunction);
+		}
+	}
+	
+	/* Start showing the very first animation i.e. just the welcome screen */
+	
+	globalID = requestAnimationFrame(currentGameStateFunction);
+		
+	
+	/* Breakout level one stuff starts here */
+	
 	
 	/* Width and height of application window in pixels */
 	const APPLICATION_WIDTH = c.getAttribute("width");
@@ -73,14 +130,15 @@ function canvasApp() {
 
 	/* Offset of the top brick row from the top */
 	const BRICK_Y_OFFSET = 70;
-
-	/* Number of turns */
-	const NTURNS = 3;
 	
 	const SCORE_INCREMENT = 100;
 	
-	var score = 0;
+	const INITIAL_LIVES = 3;
 	
+	function Player(score, lives) {
+		this.score = score;
+		this.lives = lives;
+	}
 	
 	/* The brick object. Knows how to draw itself */
 	
@@ -160,14 +218,15 @@ function canvasApp() {
 		dy += BRICK_HEIGHT + BRICK_SEP;
 	}
 
-	/* Create the paddle and the ball too */
+	/* Create the player, paddle and the ball too */
+	var player = new Player(0, INITIAL_LIVES);
 	var paddle = new Paddle();
 	var ball = new Ball();
 	
 	/* Array to store the key presses */
 	var key_press_list = [];
 	
-		
+	/* The background for level one */	
 	function drawBackground() {
 		ctx.fillStyle = 'cornsilk';
 		ctx.fillRect(0, 0, WIDTH, HEIGHT);
@@ -179,35 +238,8 @@ function canvasApp() {
 		}
 	}
 	
-	/* Keyup and keydown events */
 	
-	document.onkeydown = function(e){
-		e = e?e:window.event;  
-		key_press_list[e.keyCode] = true;
-		
-		/* The ball's motion can be controlled using the 'enter' key */
-		
-		if ( e.keyCode == 13) {
-			if ( ball.pause == 1) {
-				ball.vx = ball.vx_saved;
-				ball.vy = ball.vy_saved;
-				ball.pause = 0;
-			} else {
-				ball.vx_saved = ball.vx;
-				ball.vy_saved = ball.vy;
-				ball.vx = 0;
-				ball.vy = 0;
-				ball.pause = 1;
-			}
-		}	
-	};
-		
-	document.onkeyup = function(e){ 
-		e = e?e:window.event;
-		key_press_list[e.keyCode] = false; 
-	};
-	
-	/* Score updating function */
+	/* Score update function */
 	
 	function updateScore() {
 		score_ctx.fillStyle = 'Darkgrey';
@@ -219,7 +251,7 @@ function canvasApp() {
 	
 
 	/* All the drawing should go in here  
-	 * - Called in main drawScreen() loop
+	 * - Called in main gameStateNewGame() loop
 	 */
 	
 	function render() {
@@ -231,7 +263,7 @@ function canvasApp() {
 	}
 	
 	/* Check for controlling commands (arrow keys) from the player 
-	 * - Called in main drawScreen() loop
+	 * - Called in main gameStateNewGame() loop
 	 */
 	
 	function control() {
@@ -282,7 +314,7 @@ function canvasApp() {
 	 * animate the game play
 	 */
 	
-	function drawScreen() {	
+	function gameStateNewGame() {	
 		render();
 		control();
 		
@@ -294,6 +326,18 @@ function canvasApp() {
 		if ( (ball.y) <= 0 ) {
 			ball.vy = -ball.vy;
 		}
+		
+		if ( ball.y >= HEIGHT - BALL_RADIUS ) {
+			--player.lives;
+		}
+		
+		if ( player.lives == 0 ) {
+			// Stope this state and load the game over state
+			cancelAnimation(globalID);
+			
+		}
+		
+		
 		
 		for ( var i = 0; i < brick_array.length; ++i) {
 			if ( boundingBoxCollision(ball, brick_array[i]) ) {
@@ -313,19 +357,51 @@ function canvasApp() {
 			
 			if ( key_press_list[37] ) {
 				ball.vx -= SPEED_BUMP;
-			}
-			
+			}	
 		}
 		
 		/* Update ball position */
 		ball.x += ball.vx;
 		ball.y += ball.vy;
 		
-		globalID = requestAnimationFrame(drawScreen);
-		
+		globalID = requestAnimationFrame(gameStateNewGame);			
 	}; 
 	
-	globalID = requestAnimationFrame(drawScreen);
+	
+	
+	
+/* Keyup and keydown events */
+	// 32 - space
+	// 13 - enter
+	document.onkeydown = function(e){
+		e = e?e:window.event;  
+		key_press_list[e.keyCode] = true;
+		
+		if ( e.keyCode == 13 && start_level_one == false ) {
+			start_level_one = true;
+		}
+		
+		/* The ball's motion can be controlled using the 'enter' key */
+		
+		if ( e.keyCode == 13) {
+			if ( ball.pause == 1) {
+				ball.vx = ball.vx_saved;
+				ball.vy = ball.vy_saved;
+				ball.pause = 0;
+			} else {
+				ball.vx_saved = ball.vx;
+				ball.vy_saved = ball.vy;
+				ball.vx = 0;
+				ball.vy = 0;
+				ball.pause = 1;
+			}
+		}	
+	};
+		
+	document.onkeyup = function(e){ 
+		e = e?e:window.event;
+		key_press_list[e.keyCode] = false; 
+	};
 	
 //	const FRAME_RATE = 60;
 //	var intervalTime = 1000 / FRAME_RATE;
