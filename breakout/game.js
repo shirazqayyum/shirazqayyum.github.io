@@ -246,7 +246,7 @@ function canvasApp() {
 		score_ctx.fillRect(0, 0, score_canvas.getAttribute("width"), score_canvas.getAttribute("height"));
 		score_ctx.fillStyle = 'white';
 		score_ctx.font = "50px serif"
-		score_ctx.fillText("Score: " + score, scoreCanvas.width/10, scoreCanvas.height/1.4 );
+		score_ctx.fillText("Score: " + player.score, scoreCanvas.width/10, scoreCanvas.height/1.4 );
 	}
 	
 
@@ -344,7 +344,7 @@ function canvasApp() {
 				audioElement.play();
 				brick_array.splice(i, 1);
 				ball.vy = - ball.vy;
-				score += SCORE_INCREMENT;
+				player.score += SCORE_INCREMENT;
 				break;
 			}
 		}
