@@ -380,7 +380,7 @@ function canvasApp() {
 				bounceAudioElement.play();
 				brick_array.splice(i, 1);
 				ball.vy = - ball.vy;
-				player.score += SCORE_INCREMENT;
+				player.score += SCORE_INCREMENT * Math.abs(ball.vx);
 				break;
 			}
 		}
@@ -408,7 +408,7 @@ function canvasApp() {
 		drawScoreBackground();
 		ctx.fillStyle = 'crimson';
 		ctx.font = "100px serif";
-		ctx.fillText('Game Over',80,300);		
+		ctx.fillText('Game Over',70,300);		
 	}
 		
 /* Keyup and keydown events */
