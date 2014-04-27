@@ -149,11 +149,14 @@ function canvasApp() {
 	
 	const INITIAL_LIVES = 3;
 	
+	/* The player object */
+	
 	function Player(score, lives) {
 		this.score = score;
 		this.lives = lives;
 	}
 	
+	//function Life(x, y)
 	/* The brick object. Knows how to draw itself */
 	
 	function Brick(x, y, w, h, color) {
