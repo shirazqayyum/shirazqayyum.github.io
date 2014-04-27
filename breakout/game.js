@@ -6,22 +6,28 @@
 
 window.addEventListener('load', eventWindowLoaded, false); 
 function eventWindowLoaded() {
-var audioElement = document.getElementById("bounceAudio");
-	audioElement.addEventListener('progress',updateLoadingStatus,false);
-	audioElement.addEventListener('canplaythrough',audioLoaded,false); 
-	audioElement.load();	
+	var audioElement = document.getElementById("bounceAudio");
+	//audioElement.addEventListener('progress',updateLoadingStatus,false);
+	//audioElement.addEventListener('canplaythrough',audioLoaded,false); 
+	audioElement.load();
+	
+	//lifeImage.load();
 }
+
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
 
 var score_canvas = document.getElementById("scoreCanvas");
 var score_ctx = score_canvas.getContext("2d");
+var score_w = parseInt( score_canvas.getAttribute("width") );
+var score_h = parseInt( score_canvas.getAttribute("height") );
 
 var audioElement = document.getElementById("bounceAudio"); 
 
+var lifeImage = new Image();
+lifeImage.src = "life.png";
 
 canvasApp();
-
 
 function canvasApp() {
 	
@@ -56,36 +62,40 @@ function canvasApp() {
 	/* start game */
 	switchGameState(currentGameState);
 	
-	function currentGameStateFunction() {	
-		globalID = requestAnimationFrame(currentGameStateFunction);
+	function runGame() {
+		currentGameStateFunction();
 	}
+	
 	
 	/* This is the title page show to the user */
 	
 	function gameStateTitle() {
-		drawBackground();
+		globalID = requestAnimationFrame(gameStateTitle);
+		
+		drawScoreBackground();		
+		drawMainBackground();
+		
 		ctx.fillStyle = 'crimson';
 		ctx.font = "100px serif";
 		ctx.fillText('Breakout', 120, 300);
 		
-		globalID = requestAnimationFrame(gameStateTitle);
-		
+		ctx.fillStyle = 'black';
+		ctx.font = "50px serif";
+		ctx.fillText('Hit Enter to play', 120, 400);
 		/* If the user hits enter start_level_one is set to true */
 		
 		if ( start_level_one ) {
 			cancelAnimationFrame(globalID);
 			switchGameState(GAME_STATE_NEW_GAME);
-			globalID = requestAnimationFrame(currentGameStateFunction);
+			runGame();
 		}
 	}
 	
 	/* Start showing the very first animation i.e. just the welcome screen */
+	runGame();
 	
-	globalID = requestAnimationFrame(currentGameStateFunction);
-		
 	
 	/* Breakout level one stuff starts here */
-	
 	
 	/* Width and height of application window in pixels */
 	const APPLICATION_WIDTH = c.getAttribute("width");
@@ -227,8 +237,8 @@ function canvasApp() {
 	var key_press_list = [];
 	
 	/* The background for level one */	
-	function drawBackground() {
-		ctx.fillStyle = 'cornsilk';
+	function drawMainBackground() {
+		ctx.fillStyle = 'PapayaWhip';
 		ctx.fillRect(0, 0, WIDTH, HEIGHT);
 	}
 	
@@ -239,14 +249,27 @@ function canvasApp() {
 	}
 	
 	
+	function drawScoreBackground() {
+		score_ctx.fillStyle = 'palevioletred';
+		
+		score_ctx.fillRect(0, 0, score_w, score_h);
+	}
+	
 	/* Score update function */
 	
 	function updateScore() {
-		score_ctx.fillStyle = 'Darkgrey';
-		score_ctx.fillRect(0, 0, score_canvas.getAttribute("width"), score_canvas.getAttribute("height"));
+		drawScoreBackground();
+		
 		score_ctx.fillStyle = 'white';
-		score_ctx.font = "50px serif"
-		score_ctx.fillText("Score: " + player.score, scoreCanvas.width/10, scoreCanvas.height/1.4 );
+		score_ctx.font = (score_h - 4) + "px serif";
+		score_ctx.fillText("Score: " + player.score, scoreCanvas.width / 20, scoreCanvas.height / 1.4 );
+		
+		var life_x = player.lives * score_h;
+		life_x = score_w - life_x;
+		for ( var i = 0; i < player.lives; ++i ) {
+			score_ctx.drawImage(lifeImage, life_x, 0.1 * score_h, 0.8 * score_h, 0.8 * score_h);
+			life_x = life_x + score_h;
+		};
 	}
 	
 
@@ -255,7 +278,7 @@ function canvasApp() {
 	 */
 	
 	function render() {
-		drawBackground();
+		drawMainBackground();
 		updateScore();
 		drawBricks();
 		ball.drawBall();
@@ -315,6 +338,7 @@ function canvasApp() {
 	 */
 	
 	function gameStateNewGame() {	
+		globalID = requestAnimationFrame(gameStateNewGame);
 		render();
 		control();
 		
@@ -329,15 +353,22 @@ function canvasApp() {
 		
 		if ( ball.y >= HEIGHT - BALL_RADIUS ) {
 			--player.lives;
+			ball.y = HEIGHT / 2;
+			ball.x = WIDTH / 2;
+			ball.vx = Math.floor( (Math.random() * (BALL_MAX_VEL - BALL_MIN_VEL + 1)) + BALL_MIN_VEL);
+			paddle.x = WIDTH / 2 - PADDLE_WIDTH / 2;
+			
+			cancelAnimationFrame(globalID);
+			setTimeout(runGame, 2000);			
 		}
 		
 		if ( player.lives == 0 ) {
-			// Stope this state and load the game over state
+			// Stop this state and load the game over state
 			cancelAnimation(globalID);
-			
+			switchGameState(GAME_STATE_GAME_OVER);
+			runGame();
 		}
-		
-		
+				
 		
 		for ( var i = 0; i < brick_array.length; ++i) {
 			if ( boundingBoxCollision(ball, brick_array[i]) ) {
@@ -362,14 +393,10 @@ function canvasApp() {
 		
 		/* Update ball position */
 		ball.x += ball.vx;
-		ball.y += ball.vy;
-		
-		globalID = requestAnimationFrame(gameStateNewGame);			
+		ball.y += ball.vy;			
 	}; 
 	
-	
-	
-	
+		
 /* Keyup and keydown events */
 	// 32 - space
 	// 13 - enter
