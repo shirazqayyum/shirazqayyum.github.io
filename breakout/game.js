@@ -6,10 +6,13 @@
 
 window.addEventListener('load', eventWindowLoaded, false); 
 function eventWindowLoaded() {
-	var audioElement = document.getElementById("bounceAudio");
+	var bounceAudioElement = document.getElementById("bounceAudio");
 	//audioElement.addEventListener('progress',updateLoadingStatus,false);
 	//audioElement.addEventListener('canplaythrough',audioLoaded,false); 
-	audioElement.load();
+	bounceAudioElement.load();
+	
+	var missedAudioElement = document.getElementById("missedAudio");
+	missedAudioElement.load();
 	
 	//lifeImage.load();
 }
@@ -22,10 +25,11 @@ var score_ctx = score_canvas.getContext("2d");
 var score_w = parseInt( score_canvas.getAttribute("width") );
 var score_h = parseInt( score_canvas.getAttribute("height") );
 
-var audioElement = document.getElementById("bounceAudio"); 
+var bounceAudioElement = document.getElementById("bounceAudio"); 
+var missedAudioElement = document.getElementById("missedAudio");
 
 var lifeImage = new Image();
-lifeImage.src = "life.png";
+lifeImage.src = "life4.jpg";
 
 canvasApp();
 
@@ -116,7 +120,7 @@ function canvasApp() {
 	const NBRICKS_PER_ROW = 10;
 
 	/* Number of rows of bricks */
-	const NBRICK_ROWS = 10;
+	const NBRICK_ROWS = 8;
 
 	/* Separation between bricks */
 	const BRICK_SEP = 4;
@@ -250,8 +254,7 @@ function canvasApp() {
 	
 	
 	function drawScoreBackground() {
-		score_ctx.fillStyle = 'palevioletred';
-		
+		score_ctx.fillStyle = 'palevioletred';	
 		score_ctx.fillRect(0, 0, score_w, score_h);
 	}
 	
@@ -263,6 +266,7 @@ function canvasApp() {
 		score_ctx.fillStyle = 'white';
 		score_ctx.font = (score_h - 4) + "px serif";
 		score_ctx.fillText("Score: " + player.score, scoreCanvas.width / 20, scoreCanvas.height / 1.4 );
+		
 		
 		var life_x = player.lives * score_h;
 		life_x = score_w - life_x;
@@ -352,27 +356,28 @@ function canvasApp() {
 		}
 		
 		if ( ball.y >= HEIGHT - BALL_RADIUS ) {
+			missedAudioElement.play();
 			--player.lives;
-			ball.y = HEIGHT / 2;
-			ball.x = WIDTH / 2;
-			ball.vx = Math.floor( (Math.random() * (BALL_MAX_VEL - BALL_MIN_VEL + 1)) + BALL_MIN_VEL);
-			paddle.x = WIDTH / 2 - PADDLE_WIDTH / 2;
-			
-			cancelAnimationFrame(globalID);
-			setTimeout(runGame, 2000);			
-		}
+			if ( player.lives == 0 ) {
+				/* Stop this state and load the game over state */				
+				cancelAnimationFrame(globalID);
+				switchGameState(GAME_STATE_GAME_OVER);
+				setTimeout(runGame, 2000);
 		
-		if ( player.lives == 0 ) {
-			// Stop this state and load the game over state
-			cancelAnimation(globalID);
-			switchGameState(GAME_STATE_GAME_OVER);
-			runGame();
-		}
-				
+			} else {
+				ball.y = HEIGHT / 2;
+				ball.x = WIDTH / 2;
+				ball.vx = Math.floor( (Math.random() * (BALL_MAX_VEL - BALL_MIN_VEL + 1)) + BALL_MIN_VEL);
+				paddle.x = WIDTH / 2 - PADDLE_WIDTH / 2;
+			
+				cancelAnimationFrame(globalID);
+				setTimeout(runGame, 2000);		
+			}
+		}			
 		
 		for ( var i = 0; i < brick_array.length; ++i) {
 			if ( boundingBoxCollision(ball, brick_array[i]) ) {
-				audioElement.play();
+				bounceAudioElement.play();
 				brick_array.splice(i, 1);
 				ball.vy = - ball.vy;
 				player.score += SCORE_INCREMENT;
@@ -396,6 +401,15 @@ function canvasApp() {
 		ball.y += ball.vy;			
 	}; 
 	
+	
+	function gameStateGameOver() {
+		//globalID = requestAnimationFrame(gameStateGameOver);
+		drawMainBackground();
+		drawScoreBackground();
+		ctx.fillStyle = 'crimson';
+		ctx.font = "100px serif";
+		ctx.fillText('Game Over',80,300);		
+	}
 		
 /* Keyup and keydown events */
 	// 32 - space
